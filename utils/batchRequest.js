@@ -68,7 +68,7 @@ function requester(params) {
     combinedResults.rejected_count += !!err;
     combinedResults.accepted_count += !!result;
 
-    state.each(err, result);
+    state.every(err, result);
 
     return requester(params);
   });
@@ -110,12 +110,12 @@ function calculateWaitTime(result, roundStartTime) {
  * @return {Promise}            A promise that resolves when the queue is empty and all requests have finished
  */
 module.exports = function batchRequest(func, queue,
-  settings = { max_requesters: 10, each: (err, result) => {} }) {
+  settings = { max_requesters: 10, every: null }) {
   return new BBPromise((resolve, reject) => {
     const state = {
       round_start_time: new Date().getTime(),
       max_requesters: settings.max_requesters || 10,
-      each: (err, result) => {},
+      every: settings.every || (err, result) => {},
       requester_count: 0,
       waiting: null,
       actually_hit: 0

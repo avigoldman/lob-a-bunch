@@ -28,14 +28,19 @@ function lobPlus(lob) {
 function attachBatchCreate(resource) {
   resource.pureCreate = resource.create; // save the original create for later
 
-  resource.create = function(params, callback) {
+  resource.create = function(params, settings, callback) {
+    if (typeof settings === 'function') {
+      callback = settings;
+      settings = {};
+    }
+
     if (!(params instanceof Array)) {
       return this.pureCreate.apply(this, arguments);
     }
 
     return batchRequest(function(params, callback) {
       return resource.pureCreate(params, callback);
-    }, params).asCallback(callback);
+    }, params, settings).asCallback(callback);
   };
 }
 
@@ -46,7 +51,12 @@ function attachBatchCreate(resource) {
 function attachBatchSend(resource) {
   resource.pureCreate = resource.create; // save the original create for later
 
-  resource.create = function(params, callback) {
+  resource.create = function(params, settings, callback) {
+    if (typeof settings === 'function') {
+      callback = settings;
+      settings = {};
+    }
+
     if (!(params.to instanceof Array)) {
       return this.pureCreate.apply(this, arguments);
     }
@@ -66,7 +76,7 @@ function attachBatchSend(resource) {
 
     return batchRequest(function(params, callback) {
       return resource.pureCreate(params, callback);
-    }, payloads).asCallback(callback);
+    }, payloads, settings).asCallback(callback);
   };
 }
 
