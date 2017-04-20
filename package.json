@@ -1,0 +1,21 @@
+{
+  "name": "lob-plus",
+  "version": "0.1.0",
+  "description": "Adding lob functionality.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/"
+  },
+  "peerDependencies": {
+    "bluebird": "^3.x",
+    "lob": "^3.x"
+  },
+  "author": "Avi Goldman <me@avigoldman.com> (http://avigoldman.com)",
+  "license": "ISC",
+  "devDependencies": {
+    "bluebird": "^3.5.0"
+  },
+  "dependencies": {
+    "lodash.merge": "^4.6.0"
+  }
+}
