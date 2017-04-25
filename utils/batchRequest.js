@@ -100,10 +100,6 @@ function calculateWaitTime(result, roundStartTime) {
 }
 
 
-function is500(err) {
-  return err.status_code.toString().charAt(0) === '5';
-}
-
 /**
  * Takes a function, queue, and settings and makes requests
  * @param  {Function} func      The function to call for each value in the queue
@@ -111,20 +107,19 @@ function is500(err) {
  * @param  {Object}   settings  Settings for the requests
  * @return {Promise}            A promise that resolves when the queue is empty and all requests have finished
  */
-module.exports = function batchRequest(func, queue,
-  settings = { max_requesters: 25, every: null }) {
+module.exports = function batchRequest(func, queue, settings = {}) {
   return new BBPromise((resolve, reject) => {
     const state = {
       round_start_time: new Date().getTime(),
-      max_requesters: settings.max_requesters || 25,
+      max_requests: settings.max_requests || 25,
       every: settings.every || function(err, result) {},
       requester_count: 0,
       waiting: null,
       actually_hit: 0
     }; 
     
-    // max_requesters should never be more then the items in the queue
-    state.max_requesters = state.max_requesters > queue.length ? queue.length : state.max_requesters;
+    // max_requests should never be more then the items in the queue
+    state.max_requests = state.max_requests > queue.length ? queue.length : state.max_requests;
 
     const combinedResults = {
       rejected_count: 0,
@@ -138,7 +133,7 @@ module.exports = function batchRequest(func, queue,
       if (state.requester_count > 0) { return; }
 
       // some 5xx and no accepted results means failure      
-      if (combinedResults.errors.filter(is500).length > 0 && combinedResults.accepted_count === 0) {
+      if (combinedResults.errors.length > 0 && combinedResults.accepted_count === 0) {
         const e = new Error('Failed to make batch request.');
         e.results = combinedResults;
         reject(e);
@@ -153,7 +148,7 @@ module.exports = function batchRequest(func, queue,
     
 
     // start requesters
-    for (let i = 0; i < state.max_requesters; i++) {
+    for (let i = 0; i < state.max_requests; i++) {
       state.requester_count += 1;
       requester({ func, queue, state, combinedResults, done }); 
     }
