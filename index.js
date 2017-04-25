@@ -68,8 +68,10 @@ function attachBatchSend(resource) {
       let newParams = JSON.parse(JSON.stringify(params));
       newParams.to = recipients[i];
 
-      merge(newParams, newParams.to.overrides || {});
-      delete newParams.to.overrides;
+      if (typeof newParams.to !== 'string') {
+        merge(newParams, newParams.to.overrides || {});
+        delete newParams.to.overrides;
+      }
 
       payloads.push(newParams);
     }
