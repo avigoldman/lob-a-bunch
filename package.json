@@ -1,7 +1,7 @@
 {
-  "name": "lob-plus",
+  "name": "lob-a-bunch",
   "version": "0.1.0",
-  "description": "Adding lob functionality.",
+  "description": "Adding the ability to lob a bunch of requests at once.",
   "main": "index.js",
   "scripts": {
     "test": "node test/"
