@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "istanbul cover --report lcov --dir test/reports/ mocha --recursive ./test/ --grep ./test/**/*.spec.js -- --colors --reporter spec",
-    "it": "node test/"
+    "precommit": "standard --fix && npm run test",
+    "dev": "node dev/"
   },
   "peerDependencies": {
     "bluebird": "^3.x",
@@ -15,9 +16,11 @@
   "license": "ISC",
   "devDependencies": {
     "bluebird": "^3.5.0",
+    "husky": "^0.13.3",
     "istanbul": "^0.4.5",
     "lob": "^3.9.0",
-    "mocha": "^3.3.0"
+    "mocha": "^3.3.0",
+    "standard": "^10.0.2"
   },
   "dependencies": {
     "chai": "^3.5.0",
