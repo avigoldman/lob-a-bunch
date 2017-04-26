@@ -3,6 +3,7 @@
 const getResources = require('./utils/getResources');
 const batchRequest = require('./utils/batchRequest');
 const merge = require('lodash.merge');
+const cloneDeep = require('lodash.clonedeep');
 
 function lobPlus(lob) {
   lobCheck(lob);
@@ -85,7 +86,7 @@ function attachBatchSend(resource, key = 'create') {
     let queue = [];
 
     for (let i = 0; i < recipients.length; i++) {
-      let newParams = JSON.parse(JSON.stringify(params));
+      let newParams = cloneDeep(params);
       newParams.to = recipients[i];
 
       if (typeof newParams.to !== 'string') {
