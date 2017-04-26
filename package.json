@@ -4,7 +4,8 @@
   "description": "Adding the ability to lob a bunch of requests at once.",
   "main": "index.js",
   "scripts": {
-    "test": "node test/"
+    "test": "istanbul cover --report lcov --dir test/reports/ mocha --recursive ./test/ --grep ./test/**/*.spec.js -- --colors --reporter spec",
+    "it": "node test/"
   },
   "peerDependencies": {
     "bluebird": "^3.x",
@@ -13,9 +14,13 @@
   "author": "Avi Goldman <me@avigoldman.com> (http://avigoldman.com)",
   "license": "ISC",
   "devDependencies": {
-    "bluebird": "^3.5.0"
+    "bluebird": "^3.5.0",
+    "istanbul": "^0.4.5",
+    "lob": "^3.9.0",
+    "mocha": "^3.3.0"
   },
   "dependencies": {
+    "chai": "^3.5.0",
     "lodash.clonedeep": "^4.5.0",
     "lodash.merge": "^4.6.0"
   }
