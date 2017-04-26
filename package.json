@@ -4,8 +4,9 @@
   "description": "Adding the ability to lob a bunch of requests at once.",
   "main": "index.js",
   "scripts": {
+    "fix": "standard --fix",
     "test": "istanbul cover --report lcov --dir test/reports/ mocha --recursive ./test/ --grep ./test/**/*.spec.js -- --colors --reporter spec",
-    "precommit": "standard --fix && npm run test",
+    "precommit": "standard && npm run test",
     "dev": "node dev/"
   },
   "peerDependencies": {
