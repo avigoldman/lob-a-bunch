@@ -5,9 +5,7 @@ const batchRequest = require('./utils/batchRequest');
 const merge = require('lodash.merge');
 
 function lobPlus(lob) {
-  if (!(lob.constructor.name === 'Lob')) {
-    throw new Error('lob must be an instance of Lob Node library');
-  }
+  lobCheck(lob);
   
   // batching from the params value if its an array
   attachBatchCreate(lob.addresses);
@@ -21,26 +19,48 @@ function lobPlus(lob) {
   return lob;
 };
 
+lobPlus.safe = function(lob) {
+  lobCheck(lob);
+
+  // batching from the params value if its an array
+  attachBatchCreate(lob.addresses, 'batch');
+  attachBatchCreate(lob.bankAccounts, 'batch');
+
+  // batching from the params.to value if its an array
+  attachBatchSend(lob.postcards, 'batch');
+  attachBatchSend(lob.letters, 'batch');
+  attachBatchSend(lob.checks, 'batch');
+}
+
+function lobCheck(lob) {
+  if (!(lob.constructor.name === 'Lob')) {
+    throw new Error('lob must be an instance of Lob Node library');
+  }
+}
+
 /**
  * Overrides the create function to allow for batching from params given if its an array
  * @param  {Object} resource  The lob resource to modify (postcards, letters, etc.)
  */
-function attachBatchCreate(resource) {
+function attachBatchCreate(resource, key = 'create') {
   resource.pureCreate = resource.create; // save the original create for later
 
-  resource.create = function(params, settings, callback) {
-    if (typeof settings === 'function') {
-      callback = settings;
-      settings = {};
+  resource[key] = function(params, config, callback) {
+    if (typeof config === 'function') {
+      callback = config;
+      config = {};
     }
 
     if (!(params instanceof Array)) {
       return this.pureCreate.apply(this, arguments);
     }
 
-    return batchRequest(function(params, callback) {
+    config.queue = params;
+    config.action = function(params, callback) {
       return resource.pureCreate(params, callback);
-    }, params, settings).asCallback(callback);
+    };
+
+    return batchRequest(config).asCallback(callback);
   };
 }
 
@@ -48,13 +68,13 @@ function attachBatchCreate(resource) {
  * Overrides the create function to allow for batching from the "to" parameter in the params
  * @param  {Object} resource  The lob resource to modify (postcards, letters, etc.)
  */
-function attachBatchSend(resource) {
+function attachBatchSend(resource, key = 'create') {
   resource.pureCreate = resource.create; // save the original create for later
 
-  resource.create = function(params, settings, callback) {
-    if (typeof settings === 'function') {
-      callback = settings;
-      settings = {};
+  resource[key] = function(params, config, callback) {
+    if (typeof config === 'function') {
+      callback = config;
+      config = {};
     }
 
     if (!(params.to instanceof Array)) {
@@ -62,7 +82,7 @@ function attachBatchSend(resource) {
     }
 
     let recipients = params.to;
-    let payloads = [];
+    let queue = [];
 
     for (let i = 0; i < recipients.length; i++) {
       let newParams = JSON.parse(JSON.stringify(params));
@@ -73,12 +93,15 @@ function attachBatchSend(resource) {
         delete newParams.to.overrides;
       }
 
-      payloads.push(newParams);
+      queue.push(newParams);
     }
 
-    return batchRequest(function(params, callback) {
+    config.queue = queue;
+    config.action = function(params, callback) {
       return resource.pureCreate(params, callback);
-    }, payloads, settings).asCallback(callback);
+    };
+
+    return batchRequest(config).asCallback(callback);
   };
 }
 
