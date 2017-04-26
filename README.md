@@ -87,7 +87,7 @@ This should give use something like this back.
 ```js
 { "rejected_count": 0,
   "accepted_count": 2,
-  "batches_count": 0,
+  "batch_count": 0,
   "data":
    [ { "id": "psc_dceaa5c60f3bc71d",
        ...
@@ -169,8 +169,8 @@ Response objects contain the listed values when given in the Promise or callback
 
 * `err.rejected_count` - The number of requests that failed for any reason except rate limiting.
 * `err.accepted_count` - The number of requests that succeeded.
-* `err.batches_count` - The number of times the rate limit was hit and waited on.
-* `err.errors` - An array of all the errors that came back. The errors are passed directly from lob with the added value of `payload` which has the object sent to the API. This key only exists if there is one or more errors.
+* `err.batch_count` - The number of times the rate limit was hit and waited on.
+* `err.errors` - An array of all the errors that came back. The errors are passed directly from lob with the added value of `_request` which has the object sent to the API. This key only exists if there is one or more errors.
 * `err.data` - An array of all the successful responses. These are purely passed through from lob.
 
 
